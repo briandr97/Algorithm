@@ -12,24 +12,24 @@ class Solution {
             
             accumulatedStages[idx] = currentStage + accumulatedStages[idx+1]
             Stage(
-                index = idx, 
-                challengerCount = currentStage, 
-                clearerCount = accumulatedStages[idx]
+                level = idx, 
+                current = currentStage, 
+                total = accumulatedStages[idx]
             )
         }.sortedByDescending { it }
-        .map { it.index }
+        .map { it.level }
         .toIntArray()
     }
 }
 
 data class Stage(
-    val index: Int,
-    val challengerCount: Int,
-    val clearerCount: Int,
+    val level: Int,
+    val current: Int,
+    val total: Int,
 ): Comparable<Stage> {
     val failureRate: Float get() {
-        if(challengerCount == 0) return 0f
-        return challengerCount.toFloat() / clearerCount
+        if(current == 0) return 0f
+        return current.toFloat() / total
     }
     
     override fun compareTo(other: Stage): Int {
@@ -38,7 +38,7 @@ data class Stage(
         } else if(failureRate > other.failureRate) {
             1
         } else {
-            if(index < other.index) {
+            if(level < other.level) {
                 1
             } else {
                 -1
