@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 class Main {
-    private static HashMap<Room, Integer> dp = new HashMap<Room, Integer>();
+    private static int[][] apt = new int[15][15];
     
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -12,66 +12,31 @@ class Main {
         for(int i=0; i<repeat; i++) {
             int floor = Integer.parseInt(br.readLine().trim());
             int roomNumber = Integer.parseInt(br.readLine().trim());
-        
-            bw.write(Integer.toString(recursive(floor, roomNumber)) + "\n");
+            initApt(floor, roomNumber);
+            
+            StringBuilder answer = new StringBuilder();
+            answer.append(apt[floor][roomNumber]).append("\n");
+            bw.write(answer.toString());
             bw.flush();
-            dp.clear();
+            
+            apt = new int[15][15];
         }
         bw.close();
     }
     
-    private static Integer recursive(int floor, int roomNumber) {
-        if(floor==0) {
-            return roomNumber;
+    private static void initApt(int floorInput, int roomNumberInput) {
+        for(int floor=0; floor<=floorInput; floor++){
+            for(int roomNumber=1; roomNumber<=roomNumberInput; roomNumber++) {
+                if(floor==0) {
+                    apt[floor][roomNumber] = roomNumber;
+                    continue;
+                }
+                if(roomNumber==1) {
+                    apt[floor][roomNumber] = 1;
+                    continue;
+                }
+                apt[floor][roomNumber] = apt[floor-1][roomNumber] + apt[floor][roomNumber-1];
+            }   
         }
-        if(roomNumber==1) {
-            return 1;
-        }
-        Room room = new Room(floor, roomNumber);
-        Integer peopleCount = dp.get(room);
-        if(peopleCount == null) {
-            int result = recursive(floor, roomNumber-1) + recursive(floor-1, roomNumber);
-            dp.put(room, result);
-            return result;
-        }
-        return peopleCount;
-    }
-}
-
-class Room {
-    private final int floor;
-    private final int roomNumber;
-    
-    public Room(int floor, int roomNumber) {
-        this.floor = floor;
-        this.roomNumber = roomNumber;
-    }
-    
-    public int getFloor() {
-        return floor;
-    }
-    
-    public int getRoomNumber() {
-        return roomNumber;
-    }
-    
-    @Override
-    public boolean equals(Object object) {
-        if(!(object instanceof Room)) {
-            return false;
-        }
-        Room other = (Room)object;
-        if(floor != other.getFloor()) {
-            return false;
-        }
-        if(roomNumber != other.getRoomNumber()) {
-            return false;
-        }
-        return true;
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(floor, roomNumber);
     }
 }
