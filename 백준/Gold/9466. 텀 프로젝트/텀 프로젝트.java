@@ -33,9 +33,6 @@ class Dfs {
       if(visited[i] != 0) continue;
       dfs(i);
     }
-    for(int v: visited) {
-      if(v==3) answer++;
-    }
     return answer;
   }
   
@@ -57,10 +54,10 @@ class Dfs {
         };
         
       case 2:
-      case 3:
         while(!stack.empty()) {
           int last = stack.pop();
-          visited[last] = 3;
+          visited[last] = 2;
+          answer++;
         };
         break;
         
