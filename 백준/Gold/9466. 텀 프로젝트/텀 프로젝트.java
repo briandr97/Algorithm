@@ -19,50 +19,37 @@ public class Main {
 
 class Dfs {
   int[] choices;
-  int[] visited;
-  Stack<Integer> stack = new Stack<>();
-  int answer = 0;
+  boolean[] visited;
+  boolean[] finished;
+  int count = 0;
   
   public Dfs(int[] choices) {
     this.choices = choices;
-    this.visited = new int[choices.length];
+    this.visited = new boolean[choices.length];
+    this.finished = new boolean[choices.length];
   }
   
   public int getResult() {
     for(int i=1; i<choices.length; i++) {
-      if(visited[i] != 0) continue;
+      if(visited[i]) continue;
       dfs(i);
     }
-    return answer;
+    return choices.length - 1 - count;
   }
   
   private void dfs(int choice) {
-    visited[choice] = 1;
-    stack.push(choice);
-    
+    visited[choice] = true;
     int next = choices[choice];
-    switch(visited[next]) {
-      case 0: 
+    if(visited[next]) {
+        if(!finished[next]) {
+            for(int temp=next; temp!=choice; temp=choices[temp]) {
+                count++;
+            }
+            count++;
+        }
+    } else {
         dfs(next);
-        break;
-      
-      case 1:
-        while(true) {
-          int last = stack.pop();
-          visited[last] = 2;
-          if(last == next) break;
-        };
-        
-      case 2:
-        while(!stack.empty()) {
-          int last = stack.pop();
-          visited[last] = 2;
-          answer++;
-        };
-        break;
-        
-      default:
-        break;
     }
+    finished[choice] = true;
   }
 }
