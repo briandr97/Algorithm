@@ -80,15 +80,10 @@ class Graph {
                     if(!shark.canMove(nextValue)) continue;
                     
                     visited[next.row][next.column] = true;
-                    if(nextValue != 0 && shark.canEat(nextValue)) fishes.add(new Fish(next, nextValue));
+                    if(nextValue != 0 && shark.canEat(nextValue)) fishes.add(new Fish(next, nextValue, level));
                     else q.add(next);
-                    
                 }    
             }
-        }
-        
-        for(Fish f: fishes) {
-            f.distance = level;
         }
         
         Fish nearFish = null;
@@ -107,25 +102,6 @@ class Graph {
     }
 }
 
-class Fish {
-    final Point point;
-    final int size;
-    int distance = 0;
-    
-    public Fish(Point point, int size) {
-        this.point = point;
-        this.size = size;
-    }
-    
-    public boolean isNearerThan(Fish other) {
-        if(point.row < other.point.row) return true;
-        else if(point.row > other.point.row) return false;
-        else if(point.column < other.point.column) return true;
-        else if(point.column > other.point.column) return false;
-        else throw new IllegalStateException("fish: " + this + ", other: " + other);
-    }
-}
-
 class Point {
     final int row;
     final int column;
@@ -141,6 +117,26 @@ class Point {
     
     public Point plus(int row, int column) {
         return new Point(this.row + row, this.column + column);
+    }
+}
+
+class Fish {
+    final Point point;
+    final int size;
+    final int distance;
+    
+    public Fish(Point point, int size, int distance) {
+        this.point = point;
+        this.size = size;
+        this.distance = distance;
+    }
+    
+    public boolean isNearerThan(Fish other) {
+        if(point.row < other.point.row) return true;
+        else if(point.row > other.point.row) return false;
+        else if(point.column < other.point.column) return true;
+        else if(point.column > other.point.column) return false;
+        else throw new IllegalStateException("fish: " + this + ", other: " + other);
     }
 }
 
@@ -187,6 +183,7 @@ class Shark {
             newSize++;
             newFishCount=0;
         }
+        
         return new Shark(fish.point, newSize, newFishCount);
     }
 }
