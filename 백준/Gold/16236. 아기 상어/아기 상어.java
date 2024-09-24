@@ -124,14 +124,6 @@ class Fish {
         else if(point.column > other.point.column) return false;
         else throw new IllegalStateException("fish: " + this + ", other: " + other);
     }
-    
-    public String toString() {
-        return new StringBuilder()
-            .append("Fish(point: ").append(point)
-            .append(", size: ").append(size)
-            .append(", distance: ").append(distance)
-            .append(")").toString();
-    }
 }
 
 class Point {
@@ -149,13 +141,6 @@ class Point {
     
     public Point plus(int row, int column) {
         return new Point(this.row + row, this.column + column);
-    }
-    
-    public String toString() {
-        return new StringBuilder()
-            .append("Point(row: ").append(row)
-            .append(", column: ").append(column)
-            .append(")").toString();
     }
 }
 
@@ -202,7 +187,6 @@ class Shark {
             newSize++;
             newFishCount=0;
         }
-        
         return new Shark(fish.point, newSize, newFishCount);
     }
 }
