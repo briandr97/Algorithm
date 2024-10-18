@@ -1,5 +1,3 @@
-import java.util.*
-
 class Solution {
     fun solution(k: Int, dungeons: Array<IntArray>): Int {
         val mySolution = MySolution(dungeons, BooleanArray(dungeons.size), k)
@@ -15,26 +13,17 @@ class MySolution(
     private var max = 0
     
     fun dfsAll(): Int {
-        for(i in dungeons.indices) {
-            dfs(k, i, 0)
-        }
+        dfs(k, 0)
         return max
     }
     
-    private fun dfs(point: Int, idx: Int, depth: Int) {
-        if(point < dungeons[idx][0]) {
-            max = Math.max(max, depth)
-            return
-        }
-        if(depth == dungeons.size - 1) {
-            max = Math.max(max, depth + 1)
-            return
-        }
-        visited[idx] = true
+    fun dfs(point: Int, depth: Int) {
         for(i in dungeons.indices) {
-            if(visited[i]) continue
-            dfs(point - dungeons[idx][1], i, depth + 1)
+            if(visited[i] || point < dungeons[i][0]) continue
+            visited[i] = true
+            dfs(point - dungeons[i][1], depth + 1)
+            visited[i] = false
         }
-        visited[idx] = false
+        max = Math.max(max, depth)
     }
 }
