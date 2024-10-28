@@ -8,10 +8,8 @@ fun main() {
     val N = st.nextToken().toInt()
     val R = st.nextToken().toInt()
     val C = st.nextToken().toInt()
-
-    val boardSize = Math.pow(2.0, N.toDouble()).toInt()
+    
     var count = 0
-
     fun solution(sr: Int, sc: Int, size: Int) {
         if (sr == R && sc == C) {
             println(count)
@@ -21,23 +19,21 @@ fun main() {
 
         val rowDivider = sr + size - 1
         val columnDivider = sc + size - 1
-        val area = if (R > rowDivider) {
-            if (C > columnDivider) 3
-            else 2
+        
+        if (R > rowDivider && C > columnDivider) {
+            count += size * size * 3
+            solution(sr + size, sc + size, size / 2)
+        } else if (R > rowDivider && C <= columnDivider) {
+            count += size * size * 2
+            solution(sr + size, sc, size / 2)
+        } else if (R <= rowDivider && C > columnDivider) {
+            count += size * size * 1   
+            solution(sr, sc + size, size / 2)
         } else {
-            if (C > columnDivider) 1
-            else 0
-        }
-
-        count += size * size * area
-
-        when (area) {
-            0 -> solution(sr, sc, size / 2)
-            1 -> solution(sr, sc + size, size / 2)
-            2 -> solution(sr + size, sc, size / 2)
-            3 -> solution(sr + size, sc + size, size / 2)
+            solution(sr, sc, size / 2)
         }
     }
 
+    val boardSize = Math.pow(2.0, N.toDouble()).toInt()
     solution(0, 0, boardSize / 2)
 }
