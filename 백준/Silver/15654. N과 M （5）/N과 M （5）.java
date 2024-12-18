@@ -30,9 +30,7 @@ public class Main {
       Arrays.sort(arr);
       
       // 구현
-      for(int i=0; i<N; i++) {
-        permutation(0, i);  
-      }
+      permutation(0);
       
       // 출력
       bw.write(answer.toString());
@@ -41,25 +39,22 @@ public class Main {
       bw.close();
   }
   
-  private static void permutation(int count, int idx) throws IOException {
-    result[count++] = arr[idx];
-    visited[idx] = true;
-    
+  private static void permutation(int count) throws IOException {
     if(count == M) {
       for(int i=0; i<M; i++) {
         answer.append(result[i]);
         if(i == M-1) answer.append("\n");
         else answer.append(" ");
       }
-      visited[idx] = false;
       return;
     }
     
     for(int i=0; i<N; i++) {
       if(visited[i]) continue;
-      permutation(count, i);
+      result[count] = arr[i];
+      visited[i] = true;
+      permutation(count + 1);
+      visited[i] = false;
     }
-    
-    visited[idx] = false;
   }
 }
