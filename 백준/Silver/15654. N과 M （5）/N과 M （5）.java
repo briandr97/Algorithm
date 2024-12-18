@@ -6,6 +6,7 @@ public class Main {
     private static int M;
     private static int[] arr;
     private static int[] result;
+    private static boolean[] visited;
     private static final StringBuilder answer = new StringBuilder();
     
     public static void main(String[] args) throws IOException {
@@ -16,6 +17,7 @@ public class Main {
       StringTokenizer NM = new StringTokenizer(br.readLine());
       N = Integer.parseInt(NM.nextToken());
       M = Integer.parseInt(NM.nextToken());
+      visited = new boolean[N];
       result = new int[M];
       
       StringTokenizer input = new StringTokenizer(br.readLine());
@@ -41,6 +43,7 @@ public class Main {
   
   private static void permutation(int count, int idx) throws IOException {
     result[count++] = arr[idx];
+    visited[idx] = true;
     
     if(count == M) {
       for(int i=0; i<M; i++) {
@@ -48,20 +51,15 @@ public class Main {
         if(i == M-1) answer.append("\n");
         else answer.append(" ");
       }
+      visited[idx] = false;
       return;
     }
     
     for(int i=0; i<N; i++) {
-      if(isInResult(count, arr[i])) continue;
+      if(visited[i]) continue;
       permutation(count, i);
     }
-  }
-  
-  // 이미 선택된 원소인지 확인
-  private static boolean isInResult(int count, int target) {
-    for(int i=0; i<count; i++) {
-      if(target == result[i]) return true;
-    }
-    return false;
+    
+    visited[idx] = false;
   }
 }
