@@ -23,7 +23,7 @@ class Main {
         }
         
         // 구현
-        int max = Math.max(consecutiveLis(n-1), suspendedLis(n-1));
+        int max = Math.max(consecutiveDp(n-1), suspendedDp(n-1));
         
         bw.write(max + "\n");
         bw.flush();
@@ -31,19 +31,19 @@ class Main {
         bw.close();
     }
     
-    private static int consecutiveLis(int idx) {
+    private static int consecutiveDp(int idx) {
         if(idx == 0) return arr[0];
         if(idx == 1) return arr[0] + arr[1];
         if(consecutiveSum[idx] == 0) {
-            consecutiveSum[idx] = suspendedLis(idx-1) + arr[idx];
+            consecutiveSum[idx] = suspendedDp(idx-1) + arr[idx];
         }
         return consecutiveSum[idx];
     }
     
-    private static int suspendedLis(int idx) {
+    private static int suspendedDp(int idx) {
         if(idx <= 1) return arr[idx];
         if(suspendedSum[idx] == 0) {
-            suspendedSum[idx] = Math.max(consecutiveLis(idx-2), suspendedLis(idx-2)) + arr[idx];
+            suspendedSum[idx] = Math.max(consecutiveDp(idx-2), suspendedDp(idx-2)) + arr[idx];
         }
         return suspendedSum[idx];
     }
