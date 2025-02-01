@@ -15,12 +15,6 @@ class Solution {
             int n = Integer.parseInt(st.nextToken());
             int m = Integer.parseInt(st.nextToken());
 
-            int minFlag = 1 << (n - 1);
-            if (m < minFlag) {
-                sb.append("OFF").append("\n");
-                continue;
-            }
-
             int flag = (1 << n) - 1;
             if ((flag & m) == flag) sb.append("ON");
             else sb.append("OFF");
