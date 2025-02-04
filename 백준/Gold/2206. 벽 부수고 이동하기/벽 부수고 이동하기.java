@@ -1,6 +1,9 @@
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.StringTokenizer;
 import java.util.stream.Stream;
-import java.io.*;
 
 public class Main {
     private static int n;
@@ -16,7 +19,7 @@ public class Main {
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
         board = new int[n][m];
-        for(int i=0; i<n; i++) {
+        for (int i = 0; i < n; i++) {
             board[i] = Stream.of(br.readLine().split("")).mapToInt(Integer::parseInt).toArray();
         }
 
@@ -25,47 +28,41 @@ public class Main {
 
     private static int bfs() {
         ArrayDeque<Point> queue = new ArrayDeque<>();
-        int[][][] visited = new int[n][m][2];
-        int[][] direction = {{1,0},{0,1},{-1,0},{0,-1}};
+        boolean[][][] visited = new boolean[n][m][2];
+        int[][] direction = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
-        queue.add(new Point(0,0,1));
-        for(int i=0; i<n; i++) {
-            for(int j=0; j<m; j++) {
-                Arrays.fill(visited[i][j], MAX);
-            }
-        }
-        visited[0][0][0] = 1;
-        visited[0][0][1] = 1;
+        queue.add(new Point(0, 0, 1));
+        visited[0][0][0] = true;
+        visited[0][0][1] = true;
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             Point p = queue.poll();
+            if (p.row == n - 1 && p.column == m - 1) return p.value;
 
-            for(int[]d: direction) {
+            for (int[] d : direction) {
                 int nextRow = p.row + d[0];
                 int nextColumn = p.column + d[1];
-                if(isOut(nextRow, nextColumn)) continue;
-                if(board[nextRow][nextColumn] == 1) {
-                    if(p.isCrashed) continue;
-                    if(visited[nextRow][nextColumn][1] <= p.value + 1) continue;
-                    visited[nextRow][nextColumn][1] = p.value + 1;
-                    queue.add(new Point(nextRow, nextColumn, visited[nextRow][nextColumn][1], true));
-                } else {
+                if (isOut(nextRow, nextColumn)) continue;
+
+                if (board[nextRow][nextColumn] == 1) { // 다음 칸이 벽이면
+                    if (p.isCrashed || visited[nextRow][nextColumn][1]) continue; // 이미 벽을 부쉈거나, 다음 칸을 방문했었다면 패스
+                    visited[nextRow][nextColumn][1] = true;
+                    queue.add(new Point(nextRow, nextColumn, p.value + 1, true));
+                } else { // 다음 칸이 벽이 아니면
                     int idx = p.isCrashed ? 1 : 0;
-                    if(visited[nextRow][nextColumn][idx] <= p.value + 1) continue;
-                    visited[nextRow][nextColumn][idx] = p.value + 1;
-                    queue.add(new Point(nextRow, nextColumn, visited[nextRow][nextColumn][idx], p.isCrashed));
+                    if (visited[nextRow][nextColumn][idx]) continue; // 다음 칸을 방문했었다면 패스
+                    visited[nextRow][nextColumn][idx] = true;
+                    queue.add(new Point(nextRow, nextColumn, p.value + 1, p.isCrashed));
                 }
             }
         }
 
-        int result = Math.min(visited[n-1][m-1][0], visited[n-1][m-1][1]);
-        if(result == MAX) return -1;
-        return result;
+        return -1;
     }
 
     private static boolean isOut(int row, int column) {
-        if(row < 0 || row >= n) return true;
-        if(column < 0 || column >= m) return true;
+        if (row < 0 || row >= n) return true;
+        if (column < 0 || column >= m) return true;
         return false;
     }
 }
