@@ -2,18 +2,22 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
+    private static int[][] board;
+    private static int row;
+    private static int column;
+    
     public static void main(String[] args) throws IOException {
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
       StringTokenizer st = new StringTokenizer(br.readLine());
       
+      // 입력
       int r = Integer.parseInt(st.nextToken());
       int c = Integer.parseInt(st.nextToken());
       int k = Integer.parseInt(st.nextToken());
       
-      int row = 4;
-      int column = 4;
-      
-      int[][] board = new int[row][column];
+      board = new int[101][101];
+      row = 4;
+      column = 4;
       
       for(int i=1; i<row; i++) {
         st = new StringTokenizer(br.readLine());
@@ -22,159 +26,95 @@ public class Main {
         }
       }
       
-      for(int i=0; i<=100; i++) {
-        if(r < row && c < column) {
-          if(board[r][c] == k) {
-            System.out.println(i);
-            return;
-          }
+      // 구현
+      int time = -1;
+      for(int i=0; i<101; i++) {
+        if(board[r][c] == k) {
+          time = i;
+          break;
         }
-
-        if(row >= column) {
-           board = sortRow(board);
-        } else {
-          board = sortColumn(board);
-        }
-        board = limitBoard(board);
-        
-        row = board.length;
-        column = board[0].length;
+        if(row >= column) sortRows();
+        else sortColumns();
       }
       
-      System.out.println(-1);
+      System.out.println(time);
   }
   
-  private static int[][] limitBoard(int[][] board) {
-    int r = board.length;
-    int c = board[0].length;
-    
-    int[][] newBoard;
-    if(r > 101 && c > 101) {
-      newBoard = new int[101][101];
-    } else if(r > 101) {
-      newBoard = new int[101][c];
-    } else if(c > 101) {
-      newBoard = new int[r][101];
-    } else {
-      return board;
+  private static void sortRows() {
+    int max = 0; // 행별로 정렬한 후 변경된 열의 개수
+    for(int i=1; i<row; i++) {
+       max = Math.max(max, sortRow(i));
     }
-    for(int i=1; i<newBoard.length; i++) {
-      for(int j=1; j<newBoard[0].length; j++) {
-        newBoard[i][j] = board[i][j];
-      }
-    }
-    
-    return newBoard;
+    column = max;
   }
   
-  private static int[][] sortColumn(int[][] board) {
-    int r = board.length;
-    int c = board[0].length;
+  private static int sortRow(int rowIdx) {
+    HashMap<Integer, Integer> map = new HashMap<>();
+    PriorityQueue<Pair> queue = new PriorityQueue<>();
     
-    ArrayList<ArrayDeque<Node>> newBoard = new ArrayList<>();
-    int newRow = 0;
-    int newColumn = c;
-    
-    for(int i=1; i<c; i++) {
-      // 개수 세기
-      int[] arr = new int[101];
-      for(int j=1; j<r; j++) {
-        arr[board[j][i]]++;
-      }
-      
-      // 개수 노드로 변환
-      ArrayDeque<Node> nodes = new ArrayDeque<>();
-      for(int idx=1; idx<101; idx++) {
-        int count = arr[idx];
-        if(count == 0) continue;
-        nodes.add(new Node(idx, count));
-      }
-      
-      newRow = Math.max(newRow, nodes.size());
-      List<Node> list = new ArrayList<>(nodes);
-      Collections.sort(list);
-      nodes.clear();
-      nodes.addAll(list);
-      newBoard.add(nodes);
+    for(int i=1; i<column; i++) { // key:숫자, value:개수로 map에 저장
+    if(board[rowIdx][i] == 0) continue;
+      map.compute(board[rowIdx][i], (key, value) -> (value == null) ? 1 : value + 1);
     }
+    map.forEach((key, value) -> queue.add(new Pair(key, value)));
     
-    newRow = newRow * 2 + 1;
-    board = new int[newRow][newColumn];
-    for(int i=1; i<newColumn; i++) {
-      ArrayDeque<Node> q = newBoard.get(i - 1);
-      for(int j=1; j<newRow; j+=2) {
-        if(q.isEmpty()) continue;
-        Node node = q.poll();
-        board[j][i] = node.value;
-        board[j+1][i] = node.count;
-      }
+    Arrays.fill(board[rowIdx], 0); // 정렬한 값으로 채우기 전에 0으로 초기화
+    
+    int idx = 1;
+    while(!queue.isEmpty()) { // 우선순위 큐에서 작은 순서대로 뽑아서 배열에 입력
+      if(idx >= 101) break;
+      Pair p = queue.poll();
+      board[rowIdx][idx++] = p.value;
+      board[rowIdx][idx++] = p.count;
     }
-    
-    return board;
+    return idx; // 새로운 column (배열을 101개씩 초기화했기 때문에 몇개가 저장되어있는지 유지하기 위함)
   }
   
-  private static int[][] sortRow(int[][] board) {
-    int r = board.length;
-    int c = board[0].length;
+  private static void sortColumns() {
+    int max = 0; // 열별로 정렬한 후 변경된 행의 개수
+    for(int i=1; i<column; i++) {
+      max = Math.max(max, sortColumn(i));
+    }
+    row = max;
+  }
+  
+  private static int sortColumn(int columnIdx) {
+    HashMap<Integer, Integer> map = new HashMap<>();
+    PriorityQueue<Pair> queue = new PriorityQueue<>();
     
-    ArrayList<ArrayDeque<Node>> newBoard = new ArrayList<>();
-    int newRow = r;
-    int newColumn = 0;
+    for(int i=1; i<row; i++) { // key:숫자, value:개수로 map에 저장
+      if(board[i][columnIdx] == 0) continue;
+      map.compute(board[i][columnIdx], (key, value) -> (value == null) ? 1 : value + 1);
+    }
+    map.forEach((key, value) -> queue.add(new Pair(key, value)));
     
-    // 행마다 정렬
-    for(int i=1; i<r; i++) {
-      // 개수 세기
-      int[] arr = new int[101];
-      for(int j=1; j<c; j++) {
-        arr[board[i][j]]++;
-      }
-      
-      // 개수 노드로 변환
-      ArrayDeque<Node> nodes = new ArrayDeque<>();
-      for(int idx=1; idx<101; idx++) {
-        int count = arr[idx];
-        if(count == 0) continue;
-        nodes.add(new Node(idx, count));
-      }
-      
-      newColumn = Math.max(newColumn, nodes.size());
-      List<Node> list = new ArrayList<>(nodes);
-      Collections.sort(list);
-      nodes.clear();
-      nodes.addAll(list);
-      newBoard.add(nodes);
+    for(int i=0; i<row; i++) { // 정렬한 값으로 채우기 전에 0으로 초기화
+      board[i][columnIdx] = 0;
     }
     
-    newColumn = newColumn * 2 + 1;
-    board = new int[newRow][newColumn];
-    for(int i=1; i<newRow; i++) {
-      ArrayDeque<Node> q = newBoard.get(i - 1);
-      for(int j=1; j<newColumn; j+=2) {
-        if(q.isEmpty()) continue;
-        Node node = q.poll();
-        board[i][j] = node.value;
-        board[i][j+1] = node.count;
-      }
+    int idx = 1;
+    while(!queue.isEmpty()) { // 우선순위 큐에서 작은 순서대로 뽑아서 배열에 입력
+      if(idx >= 101) break;
+      Pair p = queue.poll();
+      board[idx++][columnIdx] = p.value;
+      board[idx++][columnIdx] = p.count;
     }
-    
-    return board;
+    return idx; // 새로운 row (배열을 101개씩 초기화했기 때문에 몇개가 저장되어있는지 유지하기 위함)
   }
 }
 
-class Node implements Comparable<Node> {
-  final int value;
-  final int count;
+class Pair implements Comparable<Pair> {
+  public int value;
+  public int count;
   
-  public Node(int value, int count) {
+  public Pair(int value, int count) {
     this.value = value;
     this.count = count;
   }
   
   @Override
-  public int compareTo(Node other) {
-    if(count == other.count) {
-      return value - other.value;
-    }
+  public int compareTo(Pair other) {
+    if(count == other.count) return value - other.value;
     return count - other.count;
   }
 }
