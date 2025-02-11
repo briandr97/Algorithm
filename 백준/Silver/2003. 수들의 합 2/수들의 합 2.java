@@ -15,26 +15,15 @@ public class Main {
         nums[i] = Integer.parseInt(st.nextToken());
       }
       
-      int front = 0;
-      int rear = 0;
-      
-      int answer = 0;
+      int front = 0, rear = 0;
       int sum = nums[0];
+      int answer = 0;
       
-      while(front < n && rear < n) {
-        if(sum == m) {
-          answer++;
-          if(rear < n - 1) {
-            sum += nums[++rear];
-            continue;
-          } else break;
-        }
+      while(front < n) {
+        if(sum == m) answer++;
         
-        if(sum < m) {
-          if(rear >= n - 1) break;
-          sum += nums[++rear];
-        } 
-        else if(sum > m) sum -= nums[front++];
+        if(sum < m && rear < n - 1) sum += nums[++rear];
+        else sum -= nums[front++];
       }
       
       System.out.println(answer);
