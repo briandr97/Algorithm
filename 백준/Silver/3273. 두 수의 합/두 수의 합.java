@@ -9,43 +9,29 @@ public class Main {
       // n 입력
       int n = Integer.parseInt(br.readLine());
       
+      int[] nums = new int[n]; // 입력될 수열
+      boolean[] hasNum = new boolean[1000001]; // 수열의 값이 해당 배열의 인덱스가 된다.
+      
       // 수열 입력
-      int[] nums = new int[n];
       st = new StringTokenizer(br.readLine());
       for(int i=0; i<n; i++) {
-        nums[i] = Integer.parseInt(st.nextToken());
+	      int num = Integer.parseInt(st.nextToken());
+        nums[i] = num;
+        hasNum[num] = true;
       }
       
       // x 입력
       int x = Integer.parseInt(br.readLine());
       
-      // 구현 시작
+      // x와 수열의 수의 차이를 인덱스로 hasNum 배열을 탐색해 true이면 해당 값이 존재하므로 answer를 늘린다.
       int answer = 0;
-      
-      // n이 1이면 투포인터를 시작하는 조건을 만족할 수 없으므로 미리 처리한다.
-      if(n == 1) {
-        if(nums[0] == x) answer = 1;
-        System.out.println(answer);
-        return;
+      for(int i=0; i<n; i++) {
+        int gap = x - nums[i];
+        if(gap < hasNum.length && gap > 0 && hasNum[gap]) {
+          answer++;
+        }
       }
       
-      // 정렬 후 투포인터로 체크한다.
-      Arrays.sort(nums);
-      
-      int front = 0;
-      int rear = n-1;
-      
-      while(front < rear) {
-          int sum = nums[front] + nums[rear];
-          if(sum < x) front++;
-          else if(sum > x) rear--;
-          else {
-            answer++;
-            front++;
-            rear--;
-          }
-      }
-      
-      System.out.println(answer);
+      System.out.println(answer/2);
   }
 }
