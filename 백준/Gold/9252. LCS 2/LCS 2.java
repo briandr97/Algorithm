@@ -1,52 +1,57 @@
 import java.util.*;
 import java.io.*;
 
-class Main {
-    private static int[][] dp;
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String first = br.readLine().trim();
-        String second = br.readLine().trim();
-        int firstLen = first.length();
-        int secondLen = second.length();
-        dp = new int[first.length()+1][second.length()+1];
-        
-        for(int i=1; i<firstLen+1; i++) {
-            for(int j=1; j<secondLen+1; j++) {
-                if(first.charAt(i-1) == second.charAt(j-1)) {
-                    dp[i][j] = dp[i-1][j-1] + 1;
-                } else {
-                    dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
-                }
-            }
-        }
-        
-        int row = firstLen;
-        int column = secondLen;
-        StringBuilder sb = new StringBuilder();
-        while(dp[row][column] != 0) {
-            if(first.charAt(row-1) == second.charAt(column-1)) {
-                sb.append(first.charAt(row-1));
-                row -= 1;
-                column -= 1;
-                continue;
-            }
-            if(dp[row-1][column] > dp[row][column-1]) {
-                row -= 1;
-            } else {
-                column -= 1;
-            }
-        }
-        
-        String reversedAnswer = sb.toString();
-        System.out.println(reversedAnswer.length());
-        for(int i=reversedAnswer.length()-1; i>=0; i--) {
-            System.out.print(reversedAnswer.charAt(i));
-        }
-    }
+public class Main {
+    static String s1;
+    static String s2;
+    static int[][] dp;
     
-    private static int max (int num1, int num2) {
-        if(num1 > num2) return num1;
-        else return num2;
+    public static void main(String[] args) throws IOException {
+      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+      s1 = br.readLine();
+      s2 = br.readLine();
+      StringBuilder sb = new StringBuilder();
+      
+      dp = new int[s1.length() + 1][s2.length() + 1];
+      for(int i=1; i<s1.length() + 1; i++) {
+        for(int j=1; j<s2.length() + 1; j++) {
+          char c1 = s1.charAt(i - 1);
+          char c2 = s2.charAt(j - 1);
+          if(c1 == c2) {
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i][j - 1], dp[i - 1][j]);
+          }
+        }
+      }
+      
+      sb.append(dp[s1.length()][s2.length()]).append("\n");
+      if(dp[s1.length()][s2.length()] == 0) {
+        System.out.println(sb);
+        return;
+      }
+      
+      ArrayDeque<Character> stack = new ArrayDeque<>();
+      dfs(stack, s1.length(), s2.length());
+      while(!stack.isEmpty()) {
+        sb.append(stack.removeLast());
+      }
+      System.out.println(sb);
+  }
+  
+  static void dfs(ArrayDeque<Character> stack, int row, int column) {
+    if(row < 1 || column < 1) return;
+    char c1 = s1.charAt(row - 1);
+    char c2 = s2.charAt(column - 1);
+    if(c1 == c2) {
+      stack.add(c1);
+      dfs(stack, row-1, column-1);
+    } else {
+      if(dp[row-1][column] > dp[row][column-1]) {
+        dfs(stack, row-1, column);
+      } else {
+        dfs(stack, row, column-1);
+      }
     }
+  }
 }
