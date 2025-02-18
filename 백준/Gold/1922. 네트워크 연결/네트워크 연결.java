@@ -68,8 +68,13 @@ class UnionFind {
     }
     
     public int find(int idx) {
+        if(parent[idx] != idx) parent[idx] = find(parent[idx]);
+        return parent[idx];
+    }
+    
+    public int find2(int idx) {
         if(parent[idx] == idx) return idx;
-        return find(parent[idx]);
+        return find2(parent[idx]);
     }
     
     public boolean merge(int v1, int v2) {
