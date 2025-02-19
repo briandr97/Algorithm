@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Main {
     
-    // 투포인터로 풀기
+    // 슬라이딩 윈도우로 풀기
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -13,22 +13,18 @@ public class Main {
         final int APEACH = 2; 
         int n = Integer.parseInt(st.nextToken());
         int k = Integer.parseInt(st.nextToken());
-        int[] dolls = Stream.of(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
+        int[] dolls = new int[n];
+        int lionCount = 0;
         
-        int left = 0;
-        int right = 0;
-        int count = 0;
+        st = new StringTokenizer(br.readLine());
+        for(int i=0; i<n; i++) {
+            if(Integer.parseInt(st.nextToken()) == LION) dolls[lionCount++] = i;
+        }
+        
         int min = 1000001;
-        
-        while(right < n) {
-            if(dolls[right] == LION) count++;
-            
-            while(count >= k) {
-                min = Math.min(min, right - left + 1);
-                if(dolls[left++] == LION) count--;
-            }
-            
-            right++;
+        for(int i=k-1; i<lionCount; i++) {
+            int gap = dolls[i] - dolls[i - k + 1] + 1;
+            min = Math.min(min, gap);
         }
         
         if(min == 1000001) min = -1;
