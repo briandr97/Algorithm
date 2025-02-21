@@ -38,12 +38,15 @@ public class Solution {
         System.out.println(sb);
     }
     
-    static void comb(int start, int scoreSum, int calorieSum) {
+    static void comb(int cnt, int scoreSum, int calorieSum) {
         if(calorieSum > calorieLimit) return;
         max = Math.max(max, scoreSum);
+        if(ingredientCount == cnt) return;
         
-        for(int i=start; i<ingredientCount; i++) {
-            comb(i + 1, scoreSum + scores[i], calorieSum + calories[i]);
-        }
+        // 이 재료를 넣는다.
+        comb(cnt + 1, scoreSum + scores[cnt], calorieSum + calories[cnt]);
+        
+        // 이 재료를 넣지 않는다.
+        comb(cnt + 1, scoreSum, calorieSum);
     }
 }
