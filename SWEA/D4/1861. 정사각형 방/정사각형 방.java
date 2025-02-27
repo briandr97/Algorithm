@@ -1,12 +1,11 @@
 import java.util.*;
-import java.util.stream.*;
 import java.io.*;
 
 public class Solution {
 	static int N;
 	static int maxMovement, minValue;
 	static int[][] board;
-	static boolean[][] visited;
+	static int[][] results;
 	static int[][] direction = {{1,0}, {0,-1}, {-1,0}, {0,1}};
 	
 	public static void main(String[] args) throws IOException {
@@ -20,7 +19,7 @@ public class Solution {
 			
 			N = Integer.parseInt(br.readLine());
 			board = new int[N][N];
-			visited = new boolean[N][N];
+			results = new int[N][N];
 			maxMovement = 0;
 			minValue = 1001;
 			
@@ -33,7 +32,7 @@ public class Solution {
 			
 			for(int i=0; i<N; i++) {
 				for(int j=0; j<N; j++) {
-					if(visited[i][j]) continue;
+					if(results[i][j] != 0) continue;
 					int result = dfs(i, j);
 					
 					if(result > maxMovement) {
@@ -55,7 +54,8 @@ public class Solution {
 	}
 	
 	static int dfs(int row, int column) {
-		visited[row][column] = true;
+		if(results[row][column] != 0) return results[row][column]; 
+		results[row][column] = 1;
 		
 		for(int[] d: direction) {
 			int nextRow = row + d[0];
@@ -64,9 +64,10 @@ public class Solution {
 			if(nextRow < 0 || nextRow >= N || nextColumn < 0 || nextColumn >= N) continue;
 			if(board[nextRow][nextColumn] - board[row][column] != 1) continue;
 			
-			return dfs(nextRow, nextColumn) + 1;
+			results[row][column] += dfs(nextRow, nextColumn);
+			return results[row][column];
 		}
 		
-		return 1;
+		return results[row][column];
 	}
 }
