@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.*;
 import java.io.*;
 
 public class Solution {
@@ -24,10 +25,7 @@ public class Solution {
 			minValue = 1001;
 			
 			for(int i=0; i<N; i++) {
-				st = new StringTokenizer(br.readLine());
-				for(int j=0; j<N; j++) {
-					board[i][j] = Integer.parseInt(st.nextToken());
-				}
+				board[i] = Stream.of(br.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
 			}
 			
 			for(int i=0; i<N; i++) {
