@@ -17,18 +17,7 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             for(int j=1; j<=N; j++) {
                 board[i][j] = Integer.parseInt(st.nextToken());  
-            }
-        }
-        
-        for(int i=1; i<=N; i++) {
-            for(int j=1; j<=N; j++) {
-                if(i == 1) {
-                    sum[i][j] = board[i][j] + sum[i][j-1];
-                } else if(j == 1) {
-                    sum[i][j] = board[i][j] + sum[i-1][j];
-                } else {
-                    sum[i][j] = board[i][j] + sum[i-1][j] + sum[i][j-1] - sum[i-1][j-1]; 
-                }
+                sum[i][j] = board[i][j] + sum[i-1][j] + sum[i][j-1] - sum[i-1][j-1]; 
             }
         }
         
