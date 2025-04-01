@@ -71,7 +71,7 @@ public class Solution {
     }
     
     static int markBoard(Point start, Direction d) {
-        Point p = start.move(d);
+        Point p = new Point(start.x + d.dx, start.y + d.dy);
         int length = 0;
         
         while(p.x >= 0 && p.x < N && p.y >= 0 && p.y < N) {
@@ -82,16 +82,16 @@ public class Solution {
             
             board[p.x][p.y] = 1;
             length++;
-            p = p.move(d);
+            p.move(d);
         }
         return length;
     }
     
     static void unmarkBoard(Point start, int length, Direction d) {
-        Point p = start.move(d);
+        Point p = new Point(start.x + d.dx, start.y + d.dy);
         for(int i=0; i<length; i++) {
             board[p.x][p.y] = 0;
-            p = p.move(d);
+            p.move(d);
         }
     }
 }
@@ -104,8 +104,9 @@ class Point {
         this.y = y;
     }
     
-    public Point move(Direction d) {
-        return new Point(x + d.dx, y + d.dy);
+    public void move(Direction d) {
+        x += d.dx;
+        y += d.dy;
     }
     
     @Override
