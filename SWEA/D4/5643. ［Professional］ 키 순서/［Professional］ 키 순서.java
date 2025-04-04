@@ -1,100 +1,76 @@
-import java.util.*;
-import java.util.stream.*;
-import java.io.*;
+  import java.util.*;
+  import java.io.*;
+  
+  public class Solution {
+      static int N, M;
+      static List<Integer>[] inEdges, outEdges;
+      static boolean[] visited;
+      
+      public static void main(String[] args) throws IOException {
+          BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+          StringBuilder sb = new StringBuilder();
+          StringTokenizer st = null;
+          
+          int T = Integer.parseInt(br.readLine());
+          for(int tc=1; tc<=T; tc++) {
+              sb.append("#").append(tc).append(" ");
+              N = Integer.parseInt(br.readLine());
+              M = Integer.parseInt(br.readLine());
+              
+              inEdges = new List[N+1]; for(int i=1; i<=N; i++) inEdges[i] = new ArrayList<>();
+              outEdges = new List[N+1]; for(int i=1; i<=N; i++) outEdges[i] = new ArrayList<>();
+              
+              for(int i=0; i<M; i++) {
+                  st = new StringTokenizer(br.readLine());
+                  int start = Integer.parseInt(st.nextToken());
+                  int end = Integer.parseInt(st.nextToken());
+                  
+                  inEdges[end].add(start);
+                  outEdges[start].add(end);
+              }
+              
+              int count = 0;
+              for(int i=1; i<=N; i++) {
+                  if(isOrdered(i)) count++;
+              }
 
-public class Solution {
-	static List<List<Integer>> toMe;
-	static List<Set<Integer>> totalToMe;
-	static List<List<Integer>> fromMe;
-	static List<Set<Integer>> totalFromMe;
-	static boolean[] toVisited;
-	static boolean[] fromVisited;
-	static int[] connected;
+              sb.append(count).append("\n");
+          }
+          
+          System.out.println(sb);
+      }
+      
+      private static boolean isOrdered (int n) {
+          visited = new boolean[N+1];
+          int in = getInDegrees(n);
+          
+          visited = new boolean[N+1];
+          int out = getOutDegrees(n);
+          
+          return in + out == N - 1;
+      }
+      
+      private static int getInDegrees(int n) {
+          visited[n] = true;
+          int count = 0;
+          
+          for(int edge: inEdges[n]) {
+              if(visited[edge]) continue;
+              count += getInDegrees(edge) + 1;
+          }
+          
+          return count;
+      }
+      
+      private static int getOutDegrees(int n) {
+          visited[n] = true;
+          int count = 0;
+          
+          for(int edge: outEdges[n]) {
+              if(visited[edge]) continue;
+              count += getOutDegrees(edge) + 1;
+          }
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
-		StringTokenizer st = null;
-
-		int t = Integer.parseInt(br.readLine());
-		for (int tc = 1; tc <= t; tc++) {
-			sb.append("#").append(tc).append(" ");
-
-			int n = Integer.parseInt(br.readLine());
-			int m = Integer.parseInt(br.readLine());
-			init(n);
-
-			for (int i = 0; i < m; i++) {
-				st = new StringTokenizer(br.readLine());
-				int a = Integer.parseInt(st.nextToken());
-				int b = Integer.parseInt(st.nextToken());
-				fromMe.get(a).add(b);
-				toMe.get(b).add(a);
-			}
-
-			for (int i = 1; i <= n; i++) {
-				calculateTotalToMe(i);
-				int to = totalToMe.get(i).size();
-				calculateTotalFromMe(i);
-				int from = totalFromMe.get(i).size();
-				connected[i] = to + from;
-			}
-
-			int count = 0;
-			for (int i = 1; i <= n; i++) {
-				if (connected[i] == n - 1) {
-					count++;
-				}
-			}
-
-			sb.append(count).append("\n");
-		}
-
-		System.out.println(sb);
-	}
-
-	static void calculateTotalToMe(int idx) {
-		if (toVisited[idx])
-			return;
-
-		for (int child : toMe.get(idx)) {
-			if (!toVisited[child]) {
-				calculateTotalToMe(child);
-			}
-			totalToMe.get(idx).add(child);
-			totalToMe.get(idx).addAll(totalToMe.get(child));
-		}
-		toVisited[idx] = true;
-	}
-
-	static void calculateTotalFromMe(int idx) {
-		if (fromVisited[idx])
-			return;
-
-		for (int parent : fromMe.get(idx)) {
-			if (!fromVisited[parent]) {
-				calculateTotalFromMe(parent);
-			}
-			totalFromMe.get(idx).add(parent);
-			totalFromMe.get(idx).addAll(totalFromMe.get(parent));
-		}
-		fromVisited[idx] = true;
-	}
-
-	static void init(int n) {
-		toMe = new ArrayList<>();
-		fromMe = new ArrayList<>();
-		totalToMe = new ArrayList<>();
-		totalFromMe = new ArrayList<>();
-		toVisited = new boolean[n + 1];
-		fromVisited = new boolean[n + 1];
-		connected = new int[n + 1];
-
-		for (int i = 0; i <= n; i++) {
-			toMe.add(new ArrayList<>());
-			fromMe.add(new ArrayList<>());
-			totalFromMe.add(new HashSet<>());
-			totalToMe.add(new HashSet<>());
-		}
-	}
-}
+          return count;
+      }
+  }
