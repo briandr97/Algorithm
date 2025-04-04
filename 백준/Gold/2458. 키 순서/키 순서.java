@@ -1,45 +1,68 @@
-import java.util.*;
-import java.util.stream.*;
-import java.io.*;
+  import java.util.*;
+  import java.io.*;
+  
+  public class Main {
+      static int N, M;
+      static List<Integer>[] inEdges, outEdges;
+      static BitSet[] inDegrees, outDegrees;
+      
+      public static void main(String[] args) throws IOException {
+          BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+          StringBuilder sb = new StringBuilder();
+          StringTokenizer st = new StringTokenizer(br.readLine());
+          
+          N = Integer.parseInt(st.nextToken());
+          M = Integer.parseInt(st.nextToken());
 
-public class Main {
-    public static void main(String[] args) throws IOException {
-      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-      StringTokenizer st = new StringTokenizer(br.readLine());
-      
-      int n = Integer.parseInt(st.nextToken());
-      int m = Integer.parseInt(st.nextToken());
-      
-      boolean[][] paths = new boolean[n + 1][n + 1];
-      
-      for(int i=0; i<m; i++) {
-          st = new StringTokenizer(br.readLine());
-          int v1 = Integer.parseInt(st.nextToken());
-          int v2 = Integer.parseInt(st.nextToken());
-          paths[v1][v2] = true;
-      }
-      
-      for(int k=1; k<=n; k++) {
-          for(int i=1; i<=n; i++) {
-              for(int j=1; j<=n; j++) {
-                  if(i == j) continue;
-                  if(paths[i][j]) continue;
-                  if(!paths[i][k] || !paths[k][j]) continue;
-                  paths[i][j] = true;
-              }
+          inEdges = new List[N+1]; for(int i=1; i<=N; i++) inEdges[i] = new ArrayList<>();
+          outEdges = new List[N+1]; for(int i=1; i<=N; i++) outEdges[i] = new ArrayList<>();
+          inDegrees = new BitSet[N + 1];
+          outDegrees = new BitSet[N + 1];
+
+          for(int i=0; i<M; i++) {
+              st = new StringTokenizer(br.readLine());
+              int start = Integer.parseInt(st.nextToken());
+              int end = Integer.parseInt(st.nextToken());
+
+              inEdges[end].add(start);
+              outEdges[start].add(end);
           }
-      }
-      
-      int count = 0;
-      for(int i=1; i<=n; i++) {
-          int sum = 0;
-          for(int j=1; j<=n; j++) {
-              if(paths[i][j]) sum++;
-              if(paths[j][i]) sum++;
+
+          int count = 0;
+          for(int i=1; i<=N; i++) {
+              if(isOrdered(i)) count++;
           }
-          if(sum == n - 1) count++;
+          
+          System.out.println(count);
       }
       
-      System.out.println(count);
+      private static boolean isOrdered (int n) {
+          return getInDegrees(n).cardinality() + getOutDegrees(n).cardinality() == N - 1;
+      }
+      
+      private static BitSet getInDegrees(int n) {
+          if(inDegrees[n] != null) return inDegrees[n];
+          BitSet bs = new BitSet(N + 1);
+          
+          for(int edge: inEdges[n]) {
+              bs.set(edge);
+              bs.or(getInDegrees(edge));
+          }
+          
+          inDegrees[n] = bs;
+          return bs;
+      }
+      
+      private static BitSet getOutDegrees(int n) {
+          if(outDegrees[n] != null) return outDegrees[n];
+          BitSet bs = new BitSet(N + 1);
+          
+          for(int edge: outEdges[n]) {
+              bs.set(edge);
+              bs.or(getOutDegrees(edge));
+          }
+
+          outDegrees[n] = bs;
+          return bs;
+      }
   }
-}
