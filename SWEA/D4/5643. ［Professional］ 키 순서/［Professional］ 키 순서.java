@@ -1,76 +1,86 @@
-  import java.util.*;
-  import java.io.*;
-  
-  public class Solution {
-      static int N, M;
-      static List<Integer>[] inEdges, outEdges;
-      static boolean[] visited;
-      
-      public static void main(String[] args) throws IOException {
-          BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-          StringBuilder sb = new StringBuilder();
-          StringTokenizer st = null;
-          
-          int T = Integer.parseInt(br.readLine());
-          for(int tc=1; tc<=T; tc++) {
-              sb.append("#").append(tc).append(" ");
-              N = Integer.parseInt(br.readLine());
-              M = Integer.parseInt(br.readLine());
-              
-              inEdges = new List[N+1]; for(int i=1; i<=N; i++) inEdges[i] = new ArrayList<>();
-              outEdges = new List[N+1]; for(int i=1; i<=N; i++) outEdges[i] = new ArrayList<>();
-              
-              for(int i=0; i<M; i++) {
-                  st = new StringTokenizer(br.readLine());
-                  int start = Integer.parseInt(st.nextToken());
-                  int end = Integer.parseInt(st.nextToken());
-                  
-                  inEdges[end].add(start);
-                  outEdges[start].add(end);
-              }
-              
-              int count = 0;
-              for(int i=1; i<=N; i++) {
-                  if(isOrdered(i)) count++;
-              }
+import java.io.*;
+import java.util.*;
 
-              sb.append(count).append("\n");
-          }
-          
-          System.out.println(sb);
-      }
-      
-      private static boolean isOrdered (int n) {
-          visited = new boolean[N+1];
-          int in = getInDegrees(n);
-          
-          visited = new boolean[N+1];
-          int out = getOutDegrees(n);
-          
-          return in + out == N - 1;
-      }
-      
-      private static int getInDegrees(int n) {
-          visited[n] = true;
-          int count = 0;
-          
-          for(int edge: inEdges[n]) {
-              if(visited[edge]) continue;
-              count += getInDegrees(edge) + 1;
-          }
-          
-          return count;
-      }
-      
-      private static int getOutDegrees(int n) {
-          visited[n] = true;
-          int count = 0;
-          
-          for(int edge: outEdges[n]) {
-              if(visited[edge]) continue;
-              count += getOutDegrees(edge) + 1;
-          }
-
-          return count;
-      }
-  }
+public class Solution {
+    static int N, M;
+    // taller[i]: i번 학생보다 키가 큰 학생들의 목록
+    // shorter[i]: i번 학생보다 키가 작은 학생들의 목록
+    static ArrayList<Integer>[] taller;
+    static ArrayList<Integer>[] shorter;
+    
+    // 메모이제이션을 위한 BitSet 배열 (1번부터 N번 학생까지)
+    static BitSet[] memoTaller;
+    static BitSet[] memoShorter;
+    
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+        
+        int T = Integer.parseInt(br.readLine().trim());
+        for (int tc = 1; tc <= T; tc++) {
+            N = Integer.parseInt(br.readLine().trim());
+            M = Integer.parseInt(br.readLine().trim());
+            
+            // 그래프 배열 초기화 (학생 번호는 1부터 N까지)
+            taller = new ArrayList[N + 1];
+            shorter = new ArrayList[N + 1];
+            for (int i = 1; i <= N; i++) {
+                taller[i] = new ArrayList<>();
+                shorter[i] = new ArrayList<>();
+            }
+            
+            for (int i = 0; i < M; i++) {
+                StringTokenizer st = new StringTokenizer(br.readLine());
+                int a = Integer.parseInt(st.nextToken());
+                int b = Integer.parseInt(st.nextToken());
+                // a가 b보다 작으므로, a의 taller 리스트에 b를 추가
+                // b의 shorter 리스트에 a를 추가
+                taller[a].add(b);
+                shorter[b].add(a);
+            }
+            
+            // 메모이제이션 배열 초기화
+            memoTaller = new BitSet[N + 1];
+            memoShorter = new BitSet[N + 1];
+            
+            int result = 0;
+            // 각 학생별로 자신보다 큰 학생 집합과 작은 학생 집합의 크기를 구함
+            for (int i = 1; i <= N; i++) {
+                BitSet bsTaller = getTaller(i);
+                BitSet bsShorter = getShorter(i);
+                // 두 집합의 합이 N-1이면 i의 순서가 결정됨
+                if (bsTaller.cardinality() + bsShorter.cardinality() == N - 1)
+                    result++;
+            }
+            
+            sb.append("#").append(tc).append(" ").append(result).append("\n");
+        }
+        System.out.print(sb);
+    }
+    
+    // i번 학생보다 키가 큰 학생들의 전이 폐쇄를 BitSet으로 반환 (메모이제이션 적용)
+    static BitSet getTaller(int i) {
+        if (memoTaller[i] != null) return memoTaller[i];
+        BitSet bs = new BitSet(N + 1);
+        for (int j : taller[i]) {
+            // j는 바로 i보다 큰 학생이므로 추가
+            bs.set(j);
+            // 재귀적으로 j번 학생보다 큰 학생들을 모두 추가 (이미 계산된 경우 재활용)
+            bs.or(getTaller(j));
+        }
+        memoTaller[i] = bs;
+        return bs;
+    }
+    
+    // i번 학생보다 키가 작은 학생들의 전이 폐쇄를 BitSet으로 반환 (메모이제이션 적용)
+    static BitSet getShorter(int i) {
+        if (memoShorter[i] != null) return memoShorter[i];
+        BitSet bs = new BitSet(N + 1);
+        for (int j : shorter[i]) {
+            bs.set(j);
+            bs.or(getShorter(j));
+        }
+        memoShorter[i] = bs;
+        return bs;
+    }
+}
