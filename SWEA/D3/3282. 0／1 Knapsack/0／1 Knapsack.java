@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.stream.*;
 import java.io.*;
 
 public class Solution {
@@ -8,38 +7,43 @@ public class Solution {
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = null;
         
-        int t = Integer.parseInt(br.readLine());
-        for(int tc=1; tc<=t; tc++) {
+        int T = Integer.parseInt(br.readLine());
+        for(int tc=1; tc<=T; tc++) {
             sb.append("#").append(tc).append(" ");
-            st = new StringTokenizer(br.readLine());
-            int n = Integer.parseInt(st.nextToken());
-            int k = Integer.parseInt(st.nextToken());
-            int[] weights = new int[n + 1];
-            int[] values = new int[n + 1];
             
-            for(int i=1; i<=n; i++) {
+            st = new StringTokenizer(br.readLine());
+            int N = Integer.parseInt(st.nextToken());
+            int K = Integer.parseInt(st.nextToken());
+            
+            int[] volumes = new int[N];
+            int[] costs = new int[N];
+            for(int i=0; i<N; i++) {
                 st = new StringTokenizer(br.readLine());
-                weights[i] = Integer.parseInt(st.nextToken());
-                values[i] = Integer.parseInt(st.nextToken());
+                volumes[i] = Integer.parseInt(st.nextToken());
+                costs[i] = Integer.parseInt(st.nextToken());
             }
             
-            int[][] dp = new int[n + 1][k + 1];
-            for(int i=1; i<=n; i++) {
-                for(int j=1; j<=k; j++) {
-                    int weight = weights[i];
-                    int value = values[i];
-                    // i번 물건을 담고 무게가 j일 때 최댓값
-                    if(j - weight >= 0) {
-                      dp[i][j] = dp[i - 1][j - weight] + value;  
+            int[] dp = new int[K + 1];
+            for(int i=0; i<N; i++) {
+                int volume = volumes[i];
+                int cost = costs[i];
+                
+                for(int j=K; j>0; j--) {
+                    if(volume > j) {
+                        break;
                     }
                     
-                    // i번 물건을 담지 않고 무게가 j일 때 최댓값
-                    dp[i][j] = Math.max(dp[i][j], dp[i - 1][j]);
+                    if(j - volume >= 0) {
+                        dp[j] = Math.max(dp[j], cost + dp[j - volume]);
+                    } else {
+                        dp[j] = Math.max(dp[j], cost);
+                    }
                 }
             }
             
-            sb.append(dp[n][k]).append("\n");
+            sb.append(dp[K]).append("\n");
         }
+        
         System.out.println(sb);
     }
 }
