@@ -32,17 +32,23 @@ public class Main {
         
         while(!queue.isEmpty()) {
             Point cur = queue.poll();
+            int curCount = crashCount[cur.r][cur.c];
+            
+            if(cur.r == N - 1 && cur.c == M - 1) break;
             
             for(int[] d: direction) {
                 Point next = cur.move(d[0], d[1]);
                 if(isOut(next.r, next.c)) continue;
                 
-                int nextCount = crashCount[cur.r][cur.c];
-                if(board[next.r][next.c]) nextCount++;
-                
-                if(crashCount[next.r][next.c] <= nextCount) continue;
-                crashCount[next.r][next.c] = nextCount;
-                queue.add(next);
+                if(board[next.r][next.c]) {
+                    if(crashCount[next.r][next.c] <= curCount + 1) continue;
+                    crashCount[next.r][next.c] = curCount + 1;
+                    queue.add(next);
+                } else {
+                    if(crashCount[next.r][next.c] <= curCount) continue;
+                    crashCount[next.r][next.c] = curCount;
+                    queue.addFirst(next);
+                }
             }
         }
         
